@@ -1,57 +1,115 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
+	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func HomePage(c *gin.Context) {
-	c.JSON(200, gin.H{
-		"message": "Hello World",
-	})
+type Hero struct {
+	Id   int    `json:"id"`
+	Name string ` json:"name"`
 }
 
-func PostHomePage(c *gin.Context) {
-	body := c.Request.Body
-	value, err := ioutil.ReadAll(body)
+var fakeHeroesDataArr = []Hero{
+	{Id: 11, Name: "Dr Nice"},
+	{Id: 12, Name: "Narco"},
+	{Id: 13, Name: "Bombasto"},
+	{Id: 14, Name: "Celeritas"},
+	{Id: 15, Name: "Magneta"},
+	{Id: 16, Name: "RubberMan"},
+	{Id: 17, Name: "Dynama"},
+	{Id: 18, Name: "Dr IQ"},
+	{Id: 19, Name: "Magma"},
+	{Id: 20, Name: "Tornado"},
+}
 
-	if err != nil {
-		fmt.Println(err.Error())
+func getAllHeroesHandler(c *gin.Context) {
+	if name, ok := c.GetQuery("name"); ok {
+		for _, v := range fakeHeroesDataArr {
+			if v.Name == name {
+				c.JSON(http.StatusOK, v)
+				return
+			}
+		}
+		c.JSON(http.StatusNotFound, gin.H{"message": "hero with name not found"})
+		return
+	} else {
+		c.JSON(http.StatusOK, fakeHeroesDataArr)
 	}
-	c.JSON(200, gin.H{
-		"message": string(value),
-	})
+
 }
 
-func QueryStrings(c *gin.Context) {
-	name := c.Query("name")
-	age := c.Query("age")
+func getHeroHandler(c *gin.Context) {
+	// change str type to int
+	heroId, _ := strconv.Atoi(c.Param("id"))
 
-	c.JSON(200, gin.H{
-		"name": name,
-		"age":  age,
-	})
+	for _, v := range fakeHeroesDataArr {
+		if v.Id == heroId {
+			c.JSON(http.StatusOK, v)
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"message": "hero with id not found"})
 }
 
-func PathParameters(c *gin.Context) {
-	name := c.Param("name")
-	age := c.Param("age")
+func addHeroHandler(c *gin.Context) {
+	var requestBody Hero
 
-	c.JSON(200, gin.H{
-		"name": name,
-		"age":  age,
-	})
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusOK, gin.H{"message": "add hero failed"})
+	}
+	var newId int = fakeHeroesDataArr[len(fakeHeroesDataArr)-1].Id + 1
+
+	fakeHeroesDataArr = append(fakeHeroesDataArr, Hero{Id: newId, Name: requestBody.Name})
+	c.JSON(http.StatusOK, Hero{Id: newId, Name: requestBody.Name})
+}
+
+func remove(slice []Hero, s int) []Hero {
+	return append(slice[:s], slice[s+1:]...)
+}
+
+func deleteHeroHandler(c *gin.Context) {
+	// change str type to int
+	heroId, _ := strconv.Atoi(c.Param("id"))
+
+	for i, v := range fakeHeroesDataArr {
+		if v.Id == heroId {
+			fakeHeroesDataArr = remove(fakeHeroesDataArr, i)
+			c.JSON(http.StatusOK, gin.H{"message": "successfully deleted"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusNotFound, gin.H{"message": "delete failed"})
+}
+
+func updateHeroHandler(c *gin.Context) {
+	var requestBody Hero
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.JSON(http.StatusOK, gin.H{"message": "update hero failed"})
+	}
+
+	for i, v := range fakeHeroesDataArr {
+		if v.Id == requestBody.Id {
+			fakeHeroesDataArr[i].Name = requestBody.Name
+			c.JSON(http.StatusOK, v)
+			return
+		}
+	}
+
 }
 
 func main() {
-	fmt.Print("Hi test")
 
 	r := gin.Default()
-	r.GET("/", HomePage)
-	r.POST("/", PostHomePage)
-	r.GET("/query", QueryStrings)
-	r.GET("/path/:name/:age", PathParameters)
+	r.GET("/api/heroes", getAllHeroesHandler)
+	r.GET("/api/heroes/:id", getHeroHandler)
+	r.POST("/api/heroes", addHeroHandler)
+	r.DELETE("/api/heroes/:id", deleteHeroHandler)
+	r.PUT("/api/heroes", updateHeroHandler)
 	r.Run()
 }

@@ -25,7 +25,7 @@ var fakeHeroesDataArr = []Hero{
 	{Id: 20, Name: "Tornado"},
 }
 
-func getAllHeroesHandler(c *gin.Context) {
+func getHeroesHandler(c *gin.Context) {
 	if name, ok := c.GetQuery("name"); ok {
 		for _, v := range fakeHeroesDataArr {
 			if v.Name == name {
@@ -108,7 +108,7 @@ func updateHeroHandler(c *gin.Context) {
 func main() {
 
 	r := gin.Default()
-	r.GET("/api/heroes", getAllHeroesHandler)
+	r.GET("/api/heroes", getHeroesHandler)
 	r.GET("/api/heroes/:id", getHeroByIdHandler)
 	r.POST("/api/heroes", addHeroHandler)
 	r.DELETE("/api/heroes/:id", deleteHeroHandler)

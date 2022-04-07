@@ -29,7 +29,9 @@ func getAllHeroesHandler(c *gin.Context) {
 	if name, ok := c.GetQuery("name"); ok {
 		for _, v := range fakeHeroesDataArr {
 			if v.Name == name {
-				c.JSON(http.StatusOK, v)
+				var heroNameArr []Hero
+				heroNameArr = append(heroNameArr, v)
+				c.JSON(http.StatusOK, heroNameArr)
 				return
 			}
 		}
@@ -41,7 +43,7 @@ func getAllHeroesHandler(c *gin.Context) {
 
 }
 
-func getHeroHandler(c *gin.Context) {
+func getHeroByIdHandler(c *gin.Context) {
 	// change str type to int
 	heroId, _ := strconv.Atoi(c.Param("id"))
 
@@ -52,7 +54,7 @@ func getHeroHandler(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusNotFound, gin.H{"message": "hero with id not found"})
+	c.JSON(http.StatusNotFound, gin.H{"message": "hero can not be found"})
 }
 
 func addHeroHandler(c *gin.Context) {
@@ -107,7 +109,7 @@ func main() {
 
 	r := gin.Default()
 	r.GET("/api/heroes", getAllHeroesHandler)
-	r.GET("/api/heroes/:id", getHeroHandler)
+	r.GET("/api/heroes/:id", getHeroByIdHandler)
 	r.POST("/api/heroes", addHeroHandler)
 	r.DELETE("/api/heroes/:id", deleteHeroHandler)
 	r.PUT("/api/heroes", updateHeroHandler)

@@ -1,0 +1,5 @@
+create table `hero`(
+  id int(10) UNSIGNED NOT NULL AUTO_INCREMENT COMMENT 'PRIMARY KEY', 
+  name varchar(25) NOT NULL,
+  PRIMARY KEY(`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;

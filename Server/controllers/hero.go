@@ -96,7 +96,7 @@ func AddHero(c *gin.Context) {
 		return
 	}
 
-	errWithName := db.Init().QueryRow("select * from hero where name = ?", requestBody.Name).Scan(&hero.Id, &hero.Name)
+	errWithName := db.Init().QueryRow("select * from hero where name = ? order by id desc limit 1", requestBody.Name).Scan(&hero.Id, &hero.Name)
 
 	if errWithName != nil {
 		fmt.Println(err.Error())

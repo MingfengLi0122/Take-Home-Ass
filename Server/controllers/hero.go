@@ -37,6 +37,8 @@ func GetHeroes(c *gin.Context) {
 		return
 	}
 
+	defer rows.Close()
+
 	for rows.Next() {
 		err = rows.Scan(&hero.Id, &hero.Name)
 		heroes = append(heroes, hero)
@@ -48,7 +50,6 @@ func GetHeroes(c *gin.Context) {
 		}
 	}
 
-	defer rows.Close()
 	c.JSON(http.StatusOK, heroes)
 }
 

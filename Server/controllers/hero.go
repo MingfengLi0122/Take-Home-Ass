@@ -16,7 +16,7 @@ func GetHeroes(c *gin.Context) {
 	)
 
 	if name, ok := c.GetQuery("name"); ok {
-		err := db.Init().QueryRow("select * from hero where name = ?", name).Scan(&hero.Id, &hero.Name)
+		rows, err := db.Init().Query("select * from hero where name like ?", name+"%")
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -24,7 +24,20 @@ func GetHeroes(c *gin.Context) {
 			return
 		}
 
-		heroes = append(heroes, hero)
+		defer rows.Close()
+
+		for rows.Next() {
+			err = rows.Scan(&hero.Id, &hero.Name)
+
+			if err != nil {
+				fmt.Println(err.Error())
+				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+				return
+			}
+
+			heroes = append(heroes, hero)
+
+		}
 		c.JSON(http.StatusOK, heroes)
 		return
 	}

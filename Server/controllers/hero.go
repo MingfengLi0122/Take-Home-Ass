@@ -20,7 +20,7 @@ func GetHeroes(c *gin.Context) {
 
 		if err != nil {
 			fmt.Println(err.Error())
-			c.JSON(404, gin.H{"message": err.Error()})
+			c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 			return
 		}
 
@@ -29,11 +29,11 @@ func GetHeroes(c *gin.Context) {
 		return
 	}
 
-	rows, err := db.Init().Query("select * from hero")
+	rows, err := db.Init().Query("select * from hero order by id asc")
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -41,13 +41,14 @@ func GetHeroes(c *gin.Context) {
 
 	for rows.Next() {
 		err = rows.Scan(&hero.Id, &hero.Name)
-		heroes = append(heroes, hero)
 
 		if err != nil {
 			fmt.Println(err.Error())
-			c.JSON(400, gin.H{"message": err.Error()})
+			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 			return
 		}
+
+		heroes = append(heroes, hero)
 	}
 
 	c.JSON(http.StatusOK, heroes)
@@ -63,7 +64,7 @@ func GetHeroById(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(404, gin.H{"message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -77,7 +78,8 @@ func AddHero(c *gin.Context) {
 	)
 
 	if err := c.BindJSON(&requestBody); err != nil {
-		c.JSON(400, gin.H{"message": err.Error()})
+		fmt.Println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -85,7 +87,7 @@ func AddHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -93,7 +95,7 @@ func AddHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -101,7 +103,7 @@ func AddHero(c *gin.Context) {
 
 	if errWithName != nil {
 		fmt.Println(err.Error())
-		c.JSON(404, gin.H{"message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -114,7 +116,7 @@ func DeleteHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -122,7 +124,7 @@ func DeleteHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(404, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -137,7 +139,7 @@ func UpdateHero(c *gin.Context) {
 
 	if err := c.BindJSON(&requestBody); err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -145,7 +147,7 @@ func UpdateHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -153,7 +155,7 @@ func UpdateHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(404, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -161,7 +163,7 @@ func UpdateHero(c *gin.Context) {
 
 	if errWithName != nil {
 		fmt.Println(err.Error())
-		c.JSON(404, gin.H{"message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 

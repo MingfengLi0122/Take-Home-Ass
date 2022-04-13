@@ -12,12 +12,6 @@
 <ul class="heroes">
   <!-- *ngFor is repeater directive 重复指令, * asterisk is important -->
   <li *ngFor="let hero of heroes">
-    <!-- event binding, when clicks button executes onSelect(hero) expression -->
-    <!-- bind css class selected when hero = selectedHero -->
-    <!-- <button [class.selected]="hero === selectedHero" type="button" (click)="onSelect(hero)">
-      <span class="badge">{{hero.id}}</span>
-      <span class="name">{{hero.name}}</span>
-    </button> -->
     <a routerLink="/detail/{{hero.id}}">
       <span class="badge">{{hero.id}}</span> {{hero.name}}
     </a>

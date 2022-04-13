@@ -18,12 +18,14 @@ export class HeroService {
   };
 
   constructor(
+    // inject service and dependency
     private http: HttpClient,
     private messageService: MessageService) { }
 
   /** GET heroes from the server */
   getHeroes(): Observable<Hero[]> {
     return this.http.get<Hero[]>(this.heroesUrl)
+      // pipe combine functions into one
       .pipe(
         tap(_ => this.log('fetched heroes')),
         catchError(this.handleError<Hero[]>('getHeroes', []))

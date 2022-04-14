@@ -4,4 +4,6 @@ CREATE TABLE `hero`(
   PRIMARY KEY(`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
-CREATE INDEX name_index ON hero(name);
+CREATE INDEX `name_index` ON `hero` (`name`);
+DROP INDEX `name_index` ON `hero`;
+CREATE INDEX `name_index` ON `hero` (`name`(4));

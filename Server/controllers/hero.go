@@ -16,7 +16,7 @@ func GetHeroes(c *gin.Context) {
 	)
 
 	if name, ok := c.GetQuery("name"); ok {
-		rows, err := db.Init().Query("select * from hero where name like ?", name+"%")
+		rows, err := db.Init().Query("select id, name from hero where name like ?", name+"%")
 
 		if err != nil {
 			fmt.Println(err.Error())
@@ -31,22 +31,28 @@ func GetHeroes(c *gin.Context) {
 
 			if err != nil {
 				fmt.Println(err.Error())
-				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+				c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 				return
 			}
 
 			heroes = append(heroes, hero)
-
 		}
+
+		if heroes == nil {
+			heroes = []models.Hero{}
+			c.JSON(http.StatusOK, heroes)
+			return
+		}
+
 		c.JSON(http.StatusOK, heroes)
 		return
 	}
 
-	rows, err := db.Init().Query("select * from hero order by id asc")
+	rows, err := db.Init().Query("select id, name from hero order by id asc")
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -57,7 +63,7 @@ func GetHeroes(c *gin.Context) {
 
 		if err != nil {
 			fmt.Println(err.Error())
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+			c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 			return
 		}
 
@@ -73,7 +79,7 @@ func GetHeroById(c *gin.Context) {
 	)
 
 	id := c.Param("id")
-	err := db.Init().QueryRow("select * from hero where id = ?", id).Scan(&hero.Id, &hero.Name)
+	err := db.Init().QueryRow("select id, name from hero where id = ?", id).Scan(&hero.Id, &hero.Name)
 
 	if err != nil {
 		fmt.Println(err.Error())
@@ -108,11 +114,11 @@ func AddHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": err.Error()})
 		return
 	}
 
-	queryRowErr := db.Init().QueryRow("select * from hero where name = ? order by id desc", requestBody.Name).Scan(&hero.Id, &hero.Name)
+	queryRowErr := db.Init().QueryRow("select id, name from hero where name = ? order by id desc", requestBody.Name).Scan(&hero.Id, &hero.Name)
 
 	if queryRowErr != nil {
 		fmt.Println(err.Error())
@@ -129,7 +135,7 @@ func DeleteHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -137,7 +143,7 @@ func DeleteHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -159,7 +165,7 @@ func UpdateHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -167,7 +173,7 @@ func UpdateHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": err.Error()})
 		return
 	}
 

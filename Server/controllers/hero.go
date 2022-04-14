@@ -52,7 +52,7 @@ func GetHeroes(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -114,7 +114,7 @@ func AddHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -143,7 +143,7 @@ func DeleteHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -165,7 +165,6 @@ func UpdateHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -173,7 +172,7 @@ func UpdateHero(c *gin.Context) {
 
 	if err != nil {
 		fmt.Println(err.Error())
-		c.JSON(http.StatusMethodNotAllowed, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 

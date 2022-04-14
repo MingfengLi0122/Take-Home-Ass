@@ -112,9 +112,9 @@ func AddHero(c *gin.Context) {
 		return
 	}
 
-	errWithName := db.Init().QueryRow("select * from hero where name = ? order by id desc limit 1", requestBody.Name).Scan(&hero.Id, &hero.Name)
+	queryRowErr := db.Init().QueryRow("select * from hero where name = ? order by id desc", requestBody.Name).Scan(&hero.Id, &hero.Name)
 
-	if errWithName != nil {
+	if queryRowErr != nil {
 		fmt.Println(err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
 		return
@@ -146,7 +146,6 @@ func DeleteHero(c *gin.Context) {
 
 func UpdateHero(c *gin.Context) {
 	var (
-		hero        models.Hero
 		requestBody models.Hero
 	)
 
@@ -172,13 +171,5 @@ func UpdateHero(c *gin.Context) {
 		return
 	}
 
-	errWithName := db.Init().QueryRow("select * from hero where id = ?", requestBody.Id).Scan(&hero.Id, &hero.Name)
-
-	if errWithName != nil {
-		fmt.Println(err.Error())
-		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, hero)
+	c.JSON(http.StatusOK, gin.H{"message": fmt.Sprintf("successfully updated hero with name %s", requestBody.Name)})
 }
